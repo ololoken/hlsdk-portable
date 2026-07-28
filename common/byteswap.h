@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "build.h"
 
+#define Swap64( x ) (((uint64_t)(( x ) & 0xFF) << 56) + ((uint64_t)((( x ) >> 8) & 0xFF) << 48) + ((uint64_t)((( x ) >> 16) & 0xFF) << 40) + ((uint64_t)((( x ) >> 24) & 0xFF) << 32) + ((uint64_t)((( x ) >> 32) & 0xFF) << 24) + ((uint64_t)((( x ) >> 40) & 0xFF) << 16) + ((uint64_t)((( x ) >> 48) & 0xFF) << 8) + ((uint64_t)((( x ) >> 56) & 0xFF)))
 #define Swap32( x ) (((uint32_t)((( x ) & 255 ) << 24 )) + ((uint32_t)(((( x ) >> 8 ) & 255 ) << 16 )) + ((uint32_t)((( x ) >> 16 ) & 255 ) << 8 ) + ((( x ) >> 24 ) & 255 ))
 #define Swap16( x ) ((uint16_t)((((uint16_t)( x ) >> 8 ) & 255 ) + (((uint16_t)( x ) & 255 ) << 8 )))
 
@@ -35,6 +36,8 @@ static inline T Byteswap( T n )
 	{
 		case 2: return Swap16( n );
 		case 4: return Swap32( n );
+		case 8: return Swap64( n );
+
 	}
 }
 
@@ -53,6 +56,7 @@ inline T UByteswap( T& n )
 	{
 		case 2: return Swap16( u );
 		case 4: return Swap32( u );
+		case 8: return Swap64( u );
 	}
 }
 
@@ -60,7 +64,7 @@ template<>
 inline float UByteswap( float& n )
 {
 	float u;
-	memcpy(&u, &n, sizeof(u) );
+	memcpy( &u, &n, sizeof(u) );
 	return SwapFloat( u );
 }
 
@@ -69,7 +73,15 @@ template<typename T>
 inline void UByteswapSW( T& n )
 {
 	T u = UByteswap( n );
-	memcpy(&n, &u, sizeof(u) );
+	memcpy( &n, &u, sizeof(u) );
+}
+
+template<typename T>
+inline T Unaligned( T& x )
+{
+	T y;
+	memcpy( &y, &x, sizeof( y ) );
+	return y;
 }
 
 #ifdef XASH_BIG_ENDIAN

@@ -2294,7 +2294,8 @@ int CRestore::ReadField( void *pBaseData, TYPEDESCRIPTION *pFields, int fieldCou
 						*( (char *)pOutputData ) = *(char *)pInputData;
 						break;
 					case FIELD_POINTER:
-						*( (void**)pOutputData ) = (void*)ULittleToHost( *(int *)pInputData );
+						// TODO: There must be another solution for 64 bit big endian
+						*( (void**)pOutputData ) = (void*)ULittleToHost( *(size_t *)pInputData );
 						break;
 					case FIELD_FUNCTION:
 						if( ( (char *)pInputData )[0] == '\0' )
